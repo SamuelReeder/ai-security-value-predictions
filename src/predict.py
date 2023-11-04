@@ -20,11 +20,11 @@ def predict_prices(normalized_prices: np.ndarray,
     for i in range(days):
         with torch.no_grad():
             # Reset the hidden state
-                # model.hidden_cell1 = (torch.zeros(1, 1, model.hidden_layer_size).to(device),
-                #                       torch.zeros(1, 1, model.hidden_layer_size).to(device))
-                # model.hidden_cell2 = (torch.zeros(1, 1, model.hidden_layer_size).to(device),
-                #                       torch.zeros(1, 1, model.hidden_layer_size).to(device))
-            
+            model.hidden_cell1 = (torch.zeros(1, 1, model.hidden_layer_size).to(device),
+                                    torch.zeros(1, 1, model.hidden_layer_size).to(device))
+            model.hidden_cell2 = (torch.zeros(1, 1, model.hidden_layer_size).to(device),
+                                    torch.zeros(1, 1, model.hidden_layer_size).to(device))
+        
             seq = torch.tensor(last_known_sequence).float().to(device)
             next_pred = model(seq).item()
             predictions.append(next_pred)
@@ -37,7 +37,7 @@ def predict_prices(normalized_prices: np.ndarray,
 
 
 # Load the model
-model_path = 'model1.pth'
+model_path = '../model1.pth'
 
 model = LSTM().to(device)
 model.load_state_dict(torch.load(model_path))

@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error
 from typing import List, Tuple, Dict, Union
 
 
-data_str = 'data/stock_min.csv'
+data_str = '../data/stock_min.csv'
 df = pd.read_csv(data_str)
 df['Close'] = df.groupby('Symbol')['Close'].transform(lambda x: np.ravel(MinMaxScaler(feature_range=(-1, 1)).fit_transform(x.values.reshape(-1,1))))
      
@@ -28,4 +28,4 @@ def create_inout_sequences(data: np.ndarray, seq_length: int = 128) -> List[Tupl
 
 
 scaler = MinMaxScaler(feature_range=(-1, 1))
-    normalized_train_data = np.ravel(scaler.fit_transform(train_group['Close'].values.reshape(-1,1))).astype(np.float32)
+normalized_train_data = np.ravel(scaler.fit_transform(train_group['Close'].values.reshape(-1,1))).astype(np.float32)

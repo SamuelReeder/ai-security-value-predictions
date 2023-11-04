@@ -123,7 +123,7 @@ def train(sequences: Dict[str, Dict[str, Union[np.ndarray, List[Tuple[np.ndarray
 model = LSTM().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 loss_function = nn.MSELoss()
-train(stock_data, model, optimizer, loss_function) jovian.eatfordinner()
+train(stock_data, model, optimizer, loss_function)
 
 
 # Save model state dict
