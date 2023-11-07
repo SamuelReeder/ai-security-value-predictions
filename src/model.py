@@ -30,13 +30,6 @@ class LSTM(nn.Module):
         predictions = self.linear(last_time_step_output)
         return predictions
     
-    
-    # def forward(self, input_seq):
-    #     lstm_out, self.hidden_cell = self.lstm(input_seq.view(len(input_seq), 1, -1), self.hidden_cell)
-    #     predictions = self.linear(lstm_out.view(len(input_seq), -1))  
-    #     return predictions[-1]
-    
-
 
 def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.ndarray]]]], 
           model: LSTM, 
@@ -44,26 +37,23 @@ def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.nda
           loss_function: nn.Module, 
           scalar: MinMaxScaler,
           batch_size: int = 1,
-          epochs: int = 1) -> None:
+          epochs: int = 15) -> None:
     model.train()
     
     loss_values = []
-    # train_loader = DataLoader(data['train'], shuffle=False, batch_size=batch_size)
+    
+    np.random.shuffle(data['train'])
 
 
     for i in range(epochs):
-        
+        # for i, (seq, labels) in enumerate(train_loader):
         for seq, labels in data['train']:
             
-            
-
-        # for seq, labels in data['train']:
             optimizer.zero_grad()
-            seq, labels = torch.tensor(seq).to(device), torch.tensor(labels).to(device)
-            # y_pred = model(seq)
+            seq = torch.tensor(seq, dtype=torch.float32).to(device)  # Convert to torch.float tensor
+            labels = torch.tensor(labels, dtype=torch.float32).to(device)  # Convert to torch.float tensor
             
-
-            y_pred = model(seq)
+            y_pred = model(seq).squeeze()  # Squeeze to match target's shape
             single_loss = loss_function(y_pred, labels)
             single_loss.backward()
             optimizer.step()
@@ -71,50 +61,54 @@ def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.nda
             loss_values.append(single_loss.item())
 
         print(f'epoch: {i:3} loss: {single_loss.item():10.8f}')
-        
-    # plt.figure(figsize=(10,5))
-    # plt.plot(loss_values, label='Training loss')
-    # plt.title('Loss over epochs')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Loss')
-    # plt.legend()
-    # plt.show() 
-    
-    batch_size = 1
 
     model.eval()
     last_known_sequence = data['train'][-1][0]
     
     predictions = []
-    # hidden_state = model.init_hidden(batch_size)
 
     for i in range(len(data['test'])):
         with torch.no_grad():
-            seq = torch.tensor(last_known_sequence).float().to(device).unsqueeze(0)  # Add batch dimension
-            next_pred = model(seq)  # This should now return a single value or a tensor with a single value
-            next_pred = next_pred.squeeze(-1)  # Flatten the tensor to ensure it's one-dimensional
+            seq = torch.tensor(last_known_sequence, dtype=torch.float32).to(device)  
+            next_pred = model(seq).squeeze()
             predictions.append(next_pred.item())  # Extract the scalar value
-            last_known_sequence = np.append(last_known_sequence[1:], next_preds.item())  # Update the sequence
+            last_known_sequence = np.append(last_known_sequence[1:], next_pred.item())  # Update the sequence
+            # print(last_known_sequence)
     
     # Convert predictions to the correct scale
     norm_predictions = scalar.inverse_transform(np.array(predictions).reshape(-1, 1)).ravel()
     test = scalar.inverse_transform(data['test'].reshape(-1, 1)).ravel()
 
-    # Calculate mean squared error
     mse = mean_squared_error(test, norm_predictions)
     print(f'Test MSE: {mse:.8f}')
     
     mse = mean_squared_error(data['test'], predictions)
     print(f'Test MSE: {mse:.8f}')
     
-    print(predictions)
-    print(norm_predictions)
+    plot_test(test, norm_predictions)
+    plot_test(data['test'], predictions)
+    
+    
+    
+def plot_loss(loss_values: List[float]) -> None:
+    plt.figure(figsize=(10,5))
+    plt.plot(loss_values, label='Training loss')
+    plt.title('Loss over epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.show() 
+    
+
+def plot_test(test, norm_predictions):
     plt.figure(figsize=(10, 5))
     plt.plot(test, label='Actual Data')
-    plt.plot(norm_predictions, label='Predicted Data', alpha=0.7)
+    plt.plot(norm_predictions, label='Predicted Data')
     plt.title('Comparison of Actual and Predicted Values')
     plt.xlabel('Time')
     plt.ylabel('Value')
     plt.legend()
     plt.show()
+    
+
     

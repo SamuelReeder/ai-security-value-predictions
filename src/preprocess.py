@@ -42,24 +42,6 @@ class Data:
             inout_seq.append((train_seq, train_label))
         return inout_seq
 
-    # def create_datasets() -> None:
-    #     for symbol, group in df.groupby('Symbol'):
-
-    #         train_size = int(len(group) * train_frac)
-    #         train_group = group.iloc[:train_size]
-    #         test_group = group.iloc[train_size:]
-
-    #         if train_group.empty or test_group.empty or len(train_group) < 2:
-    #             continue
-
-    #         scalar = MinMaxScaler(feature_range=(-1, 1))
-    #         normalized_train_data = np.ravel(scalar.fit_transform(train_group['Close'].values.reshape(-1,1))).flatten().astype(np.float32)
-    #         stock_data[symbol] = {
-    #             'train': create_inout_sequences(normalized_train_data),
-    #             'test': test_group['Close'].values  # Keep test data in original scale for evaluation
-    #         }
-    #         scalers[symbol] = scaler
-            
     def create_dataset(self, data: pd.DataFrame, scalar: MinMaxScaler) -> Dict[str, Any]:
         train_size = int(len(data) * self.train_frac)
         train_group = data.iloc[:train_size]
@@ -74,7 +56,3 @@ class Data:
         }
         
         return stock_data
-
-# read csv
-# normalize close
-# 
