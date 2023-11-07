@@ -53,21 +53,12 @@ def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.nda
 
     for i in range(epochs):
         
-        # hidden_state = model.init_hidden(batch_size)
         for seq, labels in data['train']:
             
             
 
         # for seq, labels in data['train']:
             optimizer.zero_grad()
-            
-            # batch_size_current = seq.size(0)  # Get the current batch size (might be smaller for the last batch)
-            # model.init_hidden(batch_size_current)  # Reinitialize hidden state for the current batch size
-
-            # if seq.size(0) != batch_size:
-            #     continue
-                
-            # print(seq.shape, labels.shape)
             seq, labels = torch.tensor(seq).to(device), torch.tensor(labels).to(device)
             # y_pred = model(seq)
             
@@ -78,13 +69,6 @@ def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.nda
             optimizer.step()
             
             loss_values.append(single_loss.item())
-            
-            # hidden_state = tuple(h.detach() for h in hidden_state)
-
-            
-            # model.hidden_cell = tuple([each.data for each in model.hidden_cell])
-
-
 
         print(f'epoch: {i:3} loss: {single_loss.item():10.8f}')
         
@@ -120,23 +104,6 @@ def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.nda
     mse = mean_squared_error(test, norm_predictions)
     print(f'Test MSE: {mse:.8f}')
     
-    # predictions = []
-    # for _ in range(len(data['test'])):
-    #     with torch.no_grad():
-    #         model.init_hidden(batch_size)
-    #         seq = torch.tensor(last_known_sequence).float().to(device)
-    #         next_pred = model(seq).item()
-    #         predictions.append(next_pred)
-    #         last_known_sequence = np.append(last_known_sequence[1:], next_pred)
-            
-
-    
-    # norm_predictions = scalar.inverse_transform(np.array(predictions).reshape(-1, 1)).ravel()
-    # test = scalar.inverse_transform(data['test'].reshape(-1, 1)).ravel()
-    
-    # mse = mean_squared_error(test, norm_predictions)
-    # print(f'Test MSE: {mse:.8f}')
-    
     mse = mean_squared_error(data['test'], predictions)
     print(f'Test MSE: {mse:.8f}')
     
@@ -151,53 +118,3 @@ def train_single(data: Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.nda
     plt.legend()
     plt.show()
     
-    
-    
-    
-def train(sequences: Dict[str, Dict[str, Union[np.ndarray, List[Tuple[np.ndarray, np.ndarray]]]]], 
-          model: LSTM, 
-          optimizer: torch.optim.Optimizer, 
-          loss_function: nn.Module, 
-          epochs: int = 1) -> None:
-    model.train()
-    
-    for i in range(epochs):
-        for stock in sequences:
-            for seq, labels in sequences[stock]['train']:
-                model.hidden_cell1 = tuple(hc.detach() for hc in model.hidden_cell1)
-                model.hidden_cell2 = tuple(hc.detach() for hc in model.hidden_cell2)
-                optimizer.zero_grad()
-                seq, labels = torch.tensor(seq).to(device), torch.tensor(labels).to(device)
-                y_pred = model(seq)
-                single_loss = loss_function(y_pred, labels)
-                single_loss.backward()
-                optimizer.step()
-                
-            print(f'{stock} epoch: {i:3} loss: {single_loss.item():10.8f}')
-        print(f'epoch: {i:3} loss: {single_loss.item():10.10f}')
-        
-
-    model.eval()
-    total_mse = 0
-    for stock in stock_data:
-        test_data = stock_data[stock]['test']
-        
-        last_known_sequence = stock_data[stock]['train'][-1][0]
-        
-        predictions = []
-        for i in range(len(test_data)):
-            with torch.no_grad():
-                model.hidden_cell = (torch.zeros(1, 1, model.hidden_size).to(device),
-                                     torch.zeros(1, 1, model.hidden_size).to(device))
-                seq = torch.tensor(last_known_sequence).float().to(device)
-                next_pred = model(seq).item()
-                predictions.append(next_pred)
-                last_known_sequence = np.append(last_known_sequence[1:], next_pred)
-        
-        predictions = scalers[stock].inverse_transform(np.array(predictions).reshape(-1, 1)).ravel()
-        
-        mse = mean_squared_error(test_data, predictions)
-        total_mse += mse
-        print(f'{stock} Test MSE: {mse:.8f}')
-    
-    print(f'Average Test MSE: {total_mse / len(stock_data):.8f}')
