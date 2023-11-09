@@ -1,4 +1,4 @@
-# Stock Price Prediction with LSTM
+# Price Prediction with LSTM
 
 This program leverages the Long Short-Term Memory (LSTM) architecture, a type of recurrent neural network (RNN), to predict stock prices based on historical data. LSTMs are particularly suitable for time series forecasting due to their capability to remember and utilize patterns from sequential data. This solution provides a way to capture intricate patterns and relationships in historical stock prices to predict future prices.
 
@@ -18,32 +18,28 @@ This program leverages the Long Short-Term Memory (LSTM) architecture, a type of
 - matplotlib
 
 To install the necessary libraries, use:
-
-\```
-pip install torch pandas numpy scikit-learn matplotlib
-\```
+```
+pip install torch pandas numpy scikit-learn
+```
 
 ## Usage
 
 ### Preparing Data
 
 The program expects stock data in a CSV format with the following column:
-
-\```
+```
 Close
 29.1
-...
-\```
+```
 
 Set the `csv_path` variable in your script to point to your desired CSV file.
 
 ### Training
 
 1. Run the script:
-
-\```
-python main.py
-\```
+```
+python your_training_script.py
+```
 
 This will train the LSTM model and save its parameters to the location you specified.
 
@@ -51,10 +47,9 @@ This will train the LSTM model and save its parameters to the location you speci
 
 1. Ensure you have the model saved.
 2. Adjust the script to run prediction, then:
-
-\```
-python main.py
-\```
+```
+python predict.py
+```
 
 The script will use the trained LSTM model to forecast future stock prices based on the provided historical data.
 
