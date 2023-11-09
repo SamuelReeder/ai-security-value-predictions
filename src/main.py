@@ -19,25 +19,25 @@ def main():
 	csv_path = "../data/BTC-USD.csv"
 	data = Data(csv_path, False)
 	df, scalar = data.preprocess_close()
-	# dataset = data.create_dataset(df, scalar)
+	dataset = data.create_dataset(df, scalar)
 
-	# # Define model
-	# model = LSTM().to(device)
-	# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-	# loss_function = nn.MSELoss()
-
-	# # Train model
-	# train_single(dataset, model, optimizer, loss_function, scalar)
-
-	# # Save model
-	# torch.save(model.state_dict(), "../models/new_model.pth")
-
-
+	# Define model
 	model = LSTM().to(device)
-	model.load_state_dict(torch.load(model_path))	
+	optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+	loss_function = nn.MSELoss()
+
+	# Train model
+	train_single(dataset, model, optimizer, loss_function, scalar)
+
+	# Save model
+	torch.save(model.state_dict(), "../models/new_model2.pth")
+
+
+	# model = LSTM().to(device)
+	# model.load_state_dict(torch.load(model_path))	
  
-	predictions = predict_prices(df['Close'].values, model, scalar, days=100)
-	print(predictions)
+	# predictions = predict_prices(df['Close'].values, model, scalar, days=100)
+	# print(predictions)
 
 
 if __name__ == "__main__":
