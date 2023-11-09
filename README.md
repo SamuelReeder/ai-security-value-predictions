@@ -15,9 +15,9 @@ This program leverages the Long Short-Term Memory (LSTM) architecture, a type of
 - pandas
 - NumPy
 - scikit-learn
+- matplotlib
 
 To install the necessary libraries, use:
-
 ```
 pip install torch pandas numpy scikit-learn
 ```
@@ -26,31 +26,27 @@ pip install torch pandas numpy scikit-learn
 
 ### Preparing Data
 
-The program expects stock data in a CSV format with the following structure:
-
+The program expects stock data in a CSV format with the following column:
 ```
-Symbol,Date,Open,High,Low,Close,Volume
-AADI,11-14-2018,28.95,31.2,28.2,29.1,2253
-...
+Close
+29.1
 ```
 
-Set the `data_str` variable in your script to point to your desired CSV file.
+Set the `csv_path` variable in your script to point to your desired CSV file.
 
 ### Training
 
-1. Run your training script:
-
+1. Run the script:
 ```
 python your_training_script.py
 ```
 
-This will train the LSTM model and save its parameters to `model1.pth`.
+This will train the LSTM model and save its parameters to the location you specified.
 
 ### Predicting
 
-1. Ensure you have the model saved as `model1.pth`.
-2. Run the prediction script:
-
+1. Ensure you have the model saved.
+2. Adjust the script to run prediction, then:
 ```
 python predict.py
 ```
